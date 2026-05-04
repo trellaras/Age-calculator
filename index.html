@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Υπολογισμός Ηλικίας</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+    <style>
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #f0f2f5; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 40px; 
+        }
+        .card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            max-width: 400px; 
+            width: 100%; 
+            text-align: center;
+        }
+        h2 { color: #1a73e8; }
+        input { 
+            padding: 10px; 
+            width: 80%; 
+            margin: 20px 0; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+            font-size: 1rem;
+        }
+        button { 
+            padding: 10px 20px; 
+            background-color: #1a73e8; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-weight: bold;
+        }
+        button:hover { background-color: #1557b0; }
+        #output { 
+            margin-top: 25px; 
+            text-align: left; 
+            line-height: 1.6; 
+            font-family: monospace;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            display: none; /* Hidden until calculated */
+        }
+        footer { margin-top: 20px; font-size: 0.8rem; color: #777; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>🎂 Age Calculator</h2>
+    <p>Εισάγετε την ημερομηνία γέννησής σας:</p>
+    <input type="date" id="birthday-input">
+    <br>
+    <button py-click="calculate_age">Υπολογισμός</button>
+
+    <div id="output"></div>
+</div>
+
+<footer>Coded by JohnKaL</footer>
+
+<py-config>
+    packages = ["python-dateutil"]
+</py-config>
+
+<script type="py">
+import datetime
+from dateutil.relativedelta import relativedelta
+from pyscript import document
+
+def calculate_age(event):
+    birthday_str = document.querySelector("#birthday-input").value
+    output_div = document.querySelector("#output")
+    
+    if not birthday_str:
+        output_div.style.display = "block"
+        output_div.innerText = "❌ Παρακαλώ επιλέξτε ημερομηνία!"
+        return
+
+    try:
+        # Parse the input date (HTML date input returns YYYY-MM-DD)
+        birthday = datetime.datetime.strptime(birthday_str, "%Y-%m-%d").date()
+        today = datetime.date.today()
+
+        if birthday > today:
+            output_div.style.display = "block"
+            output_div.innerText = "❌ Η ημερομηνία δεν μπορεί να είναι στο μέλλον!"
+        else:
+            # Your exact logic
+            diff = relativedelta(today, birthday)
+            total_days = (today - birthday).days
+
+            # Building the display text
+            result = f"📅 Αποτέλεσμα:\n"
+            result += "-" * 20 + "\n"
+            result += f"Έτη: {diff.years}\n"
+            result += f"Μήνες: {diff.months}\n"
+            result += f"Ημέρες: {diff.days}\n"
+            result += "-" * 20 + "\n"
+            result += f"Συνολικές ημέρες: {total_days:,}".replace(",", ".")
+
+            output_div.style.display = "block"
+            output_div.innerText = result
+
+    except Exception as e:
+        output_div.style.display = "block"
+        output_div.innerText = f"❌ Σφάλμα: {str(e)}"
+</script>
+
+</body>
+</html>
